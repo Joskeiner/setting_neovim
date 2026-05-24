@@ -75,20 +75,17 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go down" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go up" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go right" })
 
--- From VS Code keybindings (setting_vscode/keybindings.json)
-vim.keymap.set("t", "<A-Right>", "<C-\\><C-n>:tabnext<CR>", { desc = "Next terminal" })
-vim.keymap.set("t", "<A-Left>", "<C-\\><C-n>:tabprevious<CR>", { desc = "Previous terminal" })
-vim.keymap.set("n", "<leader>T", "<cmd>terminal<CR>", { desc = "New terminal" })
-vim.keymap.set("t", "<A-q>", "<C-\\><C-n>:bdelete!<CR>", { desc = "Kill terminal" })
-vim.keymap.set("n", "<A-q>", function()
-  local bufs = vim.api.nvim_list_bufs()
-  for _, buf in ipairs(bufs) do
-    if vim.bo[buf].filetype == "terminal" then
-      vim.api.nvim_buf_delete(buf, { force = true })
-      break
-    end
-  end
-end, { desc = "Kill terminal (normal)" })
+-- Terminal keybindings (toggleterm.nvim)
+vim.keymap.set("t", "<A-Right>", "<C-\\><C-n>:tabnext<CR>", { desc = "Next tab" })
+vim.keymap.set("t", "<A-Left>", "<C-\\><C-n>:tabprevious<CR>", { desc = "Previous tab" })
+vim.keymap.set("t", "<C-[>", "<C-\\><C-n>", { desc = "Exit terminal insert mode" })
+vim.keymap.set("t", "jj", "<C-\\><C-n>", { desc = "Exit terminal insert mode" })
+vim.keymap.set("t", "<C-h>", "<C-\\><C-n><C-w>h", { desc = "Go left" })
+vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j", { desc = "Go down" })
+vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k", { desc = "Go up" })
+vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l", { desc = "Go right" })
+vim.keymap.set("t", "<A-q>", "<cmd>ToggleTerm<CR>", { desc = "Hide terminal" })
+vim.keymap.set("n", "<A-q>", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
 vim.keymap.set("n", "<A-j>", function()
   local qf_open = false
   for _, win in ipairs(vim.api.nvim_list_wins()) do
