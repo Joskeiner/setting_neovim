@@ -39,3 +39,11 @@ luac.out
 *.x86_64
 *.hex
 
+# Neovim / Lazy.nvim generated files
+plugin/packer_compiled.lua
+.netrwhist
+.luacheckcache
+
+# OS files
+.DS_Store
+Thumbs.db
