@@ -63,7 +63,7 @@ return {
       preset = "modern",
       delay = 300,
       spec = {
-        { "<leader>b", desc = "Mostrar keymaps" },
+        { "<leader>b", group = "buffers" },
         { "<leader>f", group = "find/telescope" },
         { "<leader>o", group = "opencode" },
         { "<leader>od", group = "diff" },
@@ -76,7 +76,125 @@ return {
       },
     },
     keys = {
-      { "<leader>b", function() require("which-key").show({ global = true }) end, desc = "Mostrar keymaps" },
+      { "<leader>b", function() require("which-key").show({ global = true }) end, desc = "Show keymaps" },
+    },
+  },
+
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    lazy = false,
+    priority = 900,
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("bufferline").setup({
+        options = {
+          mode = "buffers",
+          separator_style = "slant",
+          show_tab_indicators = true,
+          show_close_icon = false,
+          diagnostics = "nvim_lsp",
+          diagnostics_indicator = function(count, level, diagnostics_dict, context)
+            return "(" .. count .. ")"
+          end,
+          offsets = {
+            {
+              filetype = "NvimTree",
+              text = "File Explorer",
+              text_align = "left",
+              highlight = "Directory",
+              separator = true,
+            },
+          },
+        },
+        highlights = {
+          fill = {
+            guibg = "#2E3440",
+            guifg = "#D8DEE9",
+          },
+          background = {
+            guibg = "#3B4252",
+            guifg = "#D8DEE9",
+          },
+          buffer_selected = {
+            guibg = "#4C566A",
+            guifg = "#ECEFF4",
+            gui = "bold",
+          },
+          tab_selected = {
+            guibg = "#4C566A",
+            guifg = "#88C0D0",
+            gui = "bold",
+          },
+          tab_close = {
+            guibg = "#BF616A",
+            guifg = "#ECEFF4",
+          },
+          indicator_selected = {
+            guifg = "#88C0D0",
+            guibg = "#4C566A",
+          },
+          close_button = {
+            guibg = "#3B4252",
+            guifg = "#4C566A",
+          },
+          close_button_visible = {
+            guibg = "#4C566A",
+            guifg = "#BF616A",
+          },
+          close_button_selected = {
+            guibg = "#4C566A",
+            guifg = "#BF616A",
+          },
+          duplicate = {
+            guibg = "#3B4252",
+            guifg = "#4C566A",
+          },
+          duplicate_selected = {
+            guibg = "#4C566A",
+            guifg = "#ECEFF4",
+            gui = "bold",
+          },
+          modified = {
+            guibg = "#3B4252",
+            guifg = "#EBCB8B",
+          },
+          modified_selected = {
+            guibg = "#4C566A",
+            guifg = "#EBCB8B",
+          },
+          modified_visible = {
+            guibg = "#3B4252",
+            guifg = "#EBCB8B",
+          },
+          numbers = {
+            guibg = "#3B4252",
+            guifg = "#4C566A",
+          },
+          numbers_selected = {
+            guibg = "#4C566A",
+            guifg = "#88C0D0",
+            gui = "bold",
+          },
+          error = {
+            guifg = "#BF616A",
+          },
+          error_selected = {
+            guifg = "#BF616A",
+          },
+          warning = {
+            guifg = "#EBCB8B",
+          },
+          warning_selected = {
+            guifg = "#EBCB8B",
+          },
+        },
+      })
+    end,
+    keys = {
+      { "<leader>bn", "<cmd>BufferLineCycleNext<CR>", desc = "Next buffer" },
+      { "<leader>bp", "<cmd>BufferLineCyclePrev<CR>", desc = "Previous buffer" },
+      { "<leader>bc", "<cmd>bdelete<CR>", desc = "Close buffer" },
     },
   },
 
