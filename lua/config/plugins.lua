@@ -33,6 +33,30 @@ return {
   },
 
   {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    lazy = false,
+    config = function()
+      require("toggleterm").setup({
+        size = 15,
+        direction = "horizontal",
+        start_in_insert = true,
+        persist_mode = true,
+        shade_terminals = true,
+        close_on_exit = true,
+        highlights = {
+          Normal = {
+            guibg = "#3B4252",
+          },
+        },
+      })
+    end,
+    keys = {
+      { "<leader>T", "<cmd>ToggleTerm<CR>", desc = "Toggle terminal" },
+    },
+  },
+
+  {
     "folke/which-key.nvim",
     event = "VeryLazy",
     opts = {
