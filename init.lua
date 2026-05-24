@@ -74,6 +74,8 @@ vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go left" })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go down" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go up" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go right" })
+vim.keymap.set("n", "<leader>v", "<cmd>vsplit<CR>", { desc = "Vertical split" })
+vim.keymap.set("n", "<leader>s", "<cmd>split<CR>", { desc = "Horizontal split" })
 
 -- Terminal keybindings (toggleterm.nvim)
 vim.keymap.set("t", "<A-Right>", "<C-\\><C-n>:tabnext<CR>", { desc = "Next tab" })
