@@ -63,6 +63,7 @@ nvim
 │       ├── plugins.lua      -- Definición y configuración de todos los plugins gestionados por lazy.nvim
 │       └── lsp.lua          -- Configuración de LSPs: clangd, ts_ls, keymaps y on_attach
 ├── install.sh               -- Script de instalación interactivo con backup automático
+├── web/                     -- Landing page (Astro + Tailwind v4, gestionada con bun; Neovim la ignora)
 ├── .gitignore               -- Ignora archivos generados por Neovim y el SO
 ├── README.md                -- Este archivo
 └── LICENSE                  -- Licencia del proyecto
@@ -369,6 +370,23 @@ El archivo `lazy-lock.json` se actualiza automáticamente y debe commitearse par
   ```
 - **Rust**: `rustaceanvim` asume que `rust-analyzer` está en tu `$PATH` (instálalo vía `rustup component add rust-analyzer` o Mason).
 - **Go**: `go.nvim` intentará instalar sus dependencias binarias (`gopls`, `delve`, etc.) automáticamente con `:GoInstallBinaries`.
+
+---
+
+## Landing page (`web/`)
+
+Documenta esta configuración (opciones, plugins, LSPs, keymaps) en una sola página
+construida con [Astro](https://astro.build) + Tailwind CSS v4. Se gestiona con **bun**:
+
+```bash
+bun install   # Instalar dependencias
+bun run dev   # Servidor de desarrollo (http://localhost:4321)
+bun run build # Build estático (salida en web/dist/)
+bun run preview # Previsualizar el build
+```
+
+Los mismos comandos funcionan desde la raíz (reenvían a `web/`). Ver `PLAN-LANDING.md` (plan) y `PLAN-DIFICULTAD.md` (fases por tier) para el estado
+de cada sección.
 
 ---
 

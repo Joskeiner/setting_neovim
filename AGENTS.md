@@ -15,6 +15,32 @@ This is a **Neovim configuration** (not an application). Changes are validated b
 - `lua/config/plugins.lua` — All plugin definitions for `lazy.nvim`.
 - `lua/config/lsp.lua` — LSP configs (`clangd`, `ts_ls`) using `vim.lsp.config` / `vim.lsp.enable`.
 - `lazy-lock.json` — Pin commit. Must be committed for reproducibility.
+- `web/` — Landing page (Astro + Tailwind v4, managed with **bun**). Neovim ignores it.
+
+## Landing page (`web/`)
+
+- Package manager and runtime: `bun` (not npm/node directly).
+- `bun install` — Install dependencies.
+- `bun run dev` — Dev server (`astro dev`, http://localhost:4321).
+- `bun run build` — Static build (`astro build` → `web/dist/`).
+- `bun run preview` — Preview the static build.
+- Root `package.json` (workspaces) mirrors these scripts, so they also work from
+  the repo root; the real project lives in `web/` (`cd web && bun run dev` is equivalent).
+- Tailwind v4 CSS-first: Nord tokens live in `web/src/styles/global.css` via `@theme`
+  (usable as `bg-nord0`, `text-nord4`, …). No `tailwind.config.js`.
+- Static sections render from data (`web/src/data/plugins.ts`, `web/src/data/editor.ts`,
+  `web/src/data/keymaps.ts`), never hardcoded in markup. `keymaps.ts` is the single
+  source of truth for all 102 keymaps (tree for the simulator + flat groups for the
+  filterable reference); if a keymap changes in Lua, update it there.
+- `web/src/components/nvim-preview/` — animated Neovim preview (Three.js) shown next
+  to the which-key simulator when it reaches a leaf: `resolvePreview.ts` (pure
+  command → archetype classifier, tested with `bun test`), `NvimStage.ts` (scene,
+  lazy-loaded only when a leaf is reached), `textures.ts` (CanvasTexture Nord mock).
+  No new dependencies (`three` already used by `HeroScene.ts`); fallback 2D DOM for
+  no-WebGL / `prefers-reduced-motion`. The 31 global keymaps (outside `<Space>`) are
+  not reachable from the simulator, so they have no preview.
+- After editing `web/package.json`: run `bun install` and commit `web/bun.lock`.
+- Run tests from `web/`: `bun test` (which-key state machine + resolvePreview).
 
 ## Requirements
 
