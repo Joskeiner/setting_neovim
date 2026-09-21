@@ -311,6 +311,7 @@ return {
       { "<leader>fd", "<cmd>Telescope diagnostics<CR>", desc = "Diagnostics" },
       { "<leader>fs", "<cmd>Telescope lsp_document_symbols<CR>", desc = "Document symbols" },
       { "<leader>fw", "<cmd>Telescope grep_string<CR>", desc = "Grep word under cursor" },
+      { "<leader>fc", "<cmd>Telescope colorscheme<CR>", desc = "Cambiar tema/colorscheme" },
     },
   },
 
