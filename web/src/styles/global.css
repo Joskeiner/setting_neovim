@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+/* Fuentes self-hosted (subsets latin, woff2) — fase 2.8, T2. */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/inter-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/inter-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-600.woff2") format("woff2");
+}
+
+/* Tokens Nord extraidos de lua/config/plugins.lua (PLAN-LANDING.md, seccion 3).
+   Tailwind v4 CSS-first: --color-<nombre> genera clases como bg-nord0, text-nord4, border-nord2... */
+@theme {
+  --color-nord0: #2e3440;
+  --color-nord1: #3b4252;
+  --color-nord2: #434c5e;
+  --color-nord3: #4c566a;
+  --color-nord4: #d8dee9;
+  --color-nord6: #eceff4;
+  --color-nord8: #88c0d0;
+  --color-nord11: #bf616a;
+  --color-nord13: #ebcb8b;
+
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-nord0);
+  color: var(--color-nord4);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-nord8);
+  color: var(--color-nord0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-nord8);
+  outline-offset: 2px;
+}
+
+/* ── Sistema visual (fase 2.3, T3) ────────────────────────────────────────── */
+/* Regla (PLAN-DIFICULTAD 2.3): pixel-art SOLO en acentos — badges, divisores,
+   iconos — nunca en cuerpo de texto. Voz: bun.com (sobrio tipografico) +
+   craftz.dog (tarjetas) + 8-bitquest (pixel accents). */
+
+/* Keycaps: borde inferior grueso = relieve de keycap (vincula con el hero 3D). */
+kbd {
+  border-bottom-width: 2px;
+}
+
+/* Acento pixel: marca "chip" con esquinas escalonadas (badges de modo). */
+[data-pixel] {
+  clip-path: polygon(
+    0 2px, 2px 2px, 2px 0,
+    calc(100% - 2px) 0, calc(100% - 2px) 2px, 100% 2px, 100% calc(100% - 2px),
+    calc(100% - 2px) calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%, 2px calc(100% - 2px), 0 calc(100% - 2px)
+  );
+}
+
+/* Divisor pixel: tres hileras de cuadrados degradados Karplus-detadiniendo. */
+.pixel-divider {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding-block: 0.5rem;
+}
+.pixel-divider > span {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-nord2);
+}
+.pixel-divider > span:nth-child(2) {
+  background-color: var(--color-nord8);
+}
+.pixel-divider > span:nth-child(3) {
+  background-color: var(--color-nord3);
+}
+.pixel-row {
+  display: flex;
+  gap: 6px;
+  position: relative;
+}
+.pixel-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background-color: var(--color-nord2);
+}
+.pixel-row > span {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-nord3);
+  position: relative;
+}
+
+/* Tarjetas: entrada sutil al hacer scroll (PLAN 4.4), desactivable. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Accesibilidad (PLAN-LANDING.md, rendimiento y accesibilidad; fase 2.8, T2):
+   nada de movimiento obligatorio. El hero 3D (2.4) tendra su propio fallback JS. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

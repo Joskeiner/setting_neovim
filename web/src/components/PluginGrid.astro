@@ -1,0 +1,68 @@
+---
+import SectionHeading from "./ui/SectionHeading.astro";
+import Kbd from "./ui/Kbd.astro";
+import { plugins } from "../data/plugins";
+import { keymapGroups, type KeymapEntry } from "../data/keymaps";
+
+const allEntries: KeymapEntry[] = keymapGroups.flatMap((group) => group.entries);
+
+// Resuelve cada chip a sus comandos reales con descripción en español:
+// - "<leader>ff" -> el entry exacto (normaliza <leader> a <Space>)
+// - "<leader>o…" -> expande al prefijo: los 21 comandos de OpenCode
+function entriesForChip(chip: string): KeymapEntry[] {
+  if (chip.endsWith("…")) {
+    const prefix = chip.slice(0, -1).replace("<leader>", "<Space>");
+    return allEntries.filter((entry) => entry.path.startsWith(prefix));
+  }
+  const path = chip.replace("<leader>", "<Space>");
+  return allEntries.filter((entry) => entry.path === path);
+}
+---
+<section id="plugins" class="mx-auto max-w-6xl scroll-mt-24 px-4 py-16" aria-labelledby="plugins-title">
+  <SectionHeading
+    id="plugins-title"
+    number="03"
+    eyebrow="// plugins"
+    title="Plugins y Ecosistema"
+    description="22 componentes gestionados con lazy.nvim. Cada tarjeta expone su propósito y la lista completa de sus comandos con su descripción en español."
+  />
+  <ul class="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      plugins.map((plugin) => {
+        const commands = plugin.keymaps.flatMap(entriesForChip);
+        return (
+          <li class="flex flex-col rounded-lg border border-nord2 bg-nord1 p-4 shadow-sm transition-all hover:border-nord8/60 hover:shadow-md">
+            <div class="flex items-baseline justify-between gap-2">
+              <h3 class="font-mono text-base font-semibold text-nord6">{plugin.name}</h3>
+            </div>
+            <p class="mt-1 text-sm text-nord4">{plugin.purpose}</p>
+            {commands.length > 0 ? (
+              <ul class="mt-3 space-y-1.5 border-t border-nord2/60 pt-3" aria-label={`Comandos de ${plugin.name}`}>
+                {commands.map((entry) => (
+                  <li class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                    <Kbd path={entry.path} />
+                    <span class="min-w-0 flex-1 basis-32 text-xs text-nord4">
+                      {entry.descriptionEs ?? entry.description}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="mt-3 border-t border-nord2/60 pt-3 font-mono text-[11px] text-nord4/60">
+                Sin atajos propios (soporte/infraestructura)
+              </p>
+            )}
+            <a
+              href={plugin.repo}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-3 font-mono text-xs text-nord8 hover:underline"
+            >
+              GitHub ↗
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>

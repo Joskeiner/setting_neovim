@@ -1,0 +1,40 @@
+---
+// <kbd> estilizado: tokeniza una secuencia completa (p. ej. "<Space>ff" o "<C-h>")
+// en teclas individuales legibles. La estetica fina es fase 2.3 (T3).
+import { tokenize } from "../../data/keymaps";
+
+interface Props {
+  path: string;
+}
+
+const { path } = Astro.props;
+
+const LABELS: Record<string, string> = {
+  "<Space>": "Space",
+  "<leader>": "Space",
+  "<C-Space>": "Ctrl+Space",
+  "<CR>": "Enter",
+  "<Esc>": "Esc",
+  "<Tab>": "Tab",
+};
+
+function label(token: string): string {
+  if (LABELS[token]) return LABELS[token];
+  return token
+    .replace(/^<(.*)>$/, "$1")
+    .replace(/^C-/, "Ctrl+")
+    .replace(/^S-/, "Shift+")
+    .replace(/^A-/, "Alt+")
+    .replace(/^\\/, "\\");
+}
+---
+<span class="inline-flex items-center gap-1 font-mono text-xs" aria-label={path}>
+  {
+    tokenize(path).map((token, i) => (
+      <>
+        {i > 0 && <span aria-hidden="true" class="text-nord4/70">+</span>}
+        <kbd class="rounded border border-nord3 bg-nord0 px-1.5 py-0.5 text-nord8">{label(token)}</kbd>
+      </>
+    ))
+  }
+</span>

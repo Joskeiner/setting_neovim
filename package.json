@@ -1,0 +1,13 @@
+{
+  "name": "setting-neovim",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Configuracion personal de Neovim + landing page (web/). Neovim ignora web/ y este package.json.",
+  "workspaces": ["web"],
+  "scripts": {
+    "dev": "cd web && bun run dev",
+    "build": "cd web && bun run build",
+    "preview": "cd web && bun run preview"
+  }
+}

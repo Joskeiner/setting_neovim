@@ -1,0 +1,37 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import WhichKeySimulator from "../components/WhichKeySimulator.astro";
+import KeymapReference from "../components/KeymapReference.astro";
+import PluginGrid from "../components/PluginGrid.astro";
+import LspSection from "../components/LspSection.astro";
+import InstallSection from "../components/InstallSection.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import PixelDivider from "../components/ui/PixelDivider.astro";
+import "../styles/global.css";
+---
+<Base>
+  <Hero />
+
+  <PixelDivider />
+
+  <WhichKeySimulator />
+
+  <PixelDivider />
+
+  <KeymapReference />
+
+  <PixelDivider />
+
+  <PluginGrid />
+
+  <PixelDivider />
+
+  <LspSection />
+
+  <PixelDivider />
+
+  <InstallSection />
+
+  <SiteFooter />
+</Base>

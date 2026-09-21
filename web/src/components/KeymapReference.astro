@@ -1,0 +1,77 @@
+---
+import SectionHeading from "./ui/SectionHeading.astro";
+import Kbd from "./ui/Kbd.astro";
+import { keymapGroups, keymapCount } from "../data/keymaps";
+import { entrySearchText, entryPathCompact, normalizeKeymapText } from "./keymap-filter";
+
+const MODE_LABEL: Record<string, string> = {
+  n: "n",
+  i: "i",
+  t: "t",
+  v: "v",
+};
+---
+<section id="keymaps" class="mx-auto max-w-6xl scroll-mt-24 px-4 py-16" aria-labelledby="keymaps-title">
+  <SectionHeading
+    id="keymaps-title"
+    number="02"
+    eyebrow="// referencia"
+    title="Referencia completa de keymaps"
+    description={`${keymapCount} keymaps transcritos de init.lua, plugins.lua y lsp.lua (fuente única: src/data/keymaps.ts). Grupos colapsables con <details> nativo: todo visible sin JS.`}
+  />
+
+  <div class="mb-6 flex flex-wrap items-center gap-3">
+    <label for="keymap-search" class="font-mono text-sm text-nord8">buscar:</label>
+    <input
+      id="keymap-search"
+      type="search"
+      placeholder='p. ej. "diff", "ctrl+h", "grep", "t"'
+      class="w-full max-w-sm rounded border border-nord3 bg-nord1 px-3 py-2 font-mono text-sm text-nord6 placeholder:text-nord4/70 focus:border-nord8"
+      autocomplete="off"
+    />
+    <p id="keymap-status" role="status" aria-live="polite" class="font-mono text-xs text-nord4">
+      {keymapCount} keymaps
+    </p>
+  </div>
+
+  <div class="grid items-start gap-4 lg:grid-cols-2">
+    {
+      keymapGroups.map((group) => (
+        <details open data-group={group.id} class="rounded-lg border border-nord2 bg-nord1">
+          <summary class="cursor-pointer select-none rounded-lg px-4 py-3 font-mono text-sm font-semibold text-nord6 hover:bg-nord2">
+            {group.title} <span class="text-nord4/70">({group.entries.length})</span>
+          </summary>
+          <ul class="border-t border-nord2">
+            {group.entries.map((entry) => (
+              <li
+                data-search={`${entrySearchText(entry)} ${normalizeKeymapText(group.title)}`}
+                data-path-compact={entryPathCompact(entry.path)}
+                class="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-nord2/60 px-4 py-2.5 last:border-0"
+              >
+                <Kbd path={entry.path} />
+                <span class="flex gap-1" aria-label={`Modos: ${entry.modes.join(", ")}`}>
+                  {entry.modes.map((mode) => (
+                    <span class="rounded bg-nord3/50 px-1 font-mono text-[10px] text-nord4">{MODE_LABEL[mode]}</span>
+                  ))}
+                </span>
+                <span class="min-w-0 flex-1 basis-48">
+                  <span class="block text-sm text-nord4">{entry.descriptionEs ?? entry.description}</span>
+                  {entry.descriptionEs && entry.descriptionEs !== entry.description && (
+                    <span class="block text-xs text-nord4/60">{entry.description}</span>
+                  )}
+                </span>
+                {entry.source && (
+                  <span class="font-mono text-[10px] text-nord4/70">{entry.source}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import "./keymap-filter";
+</script>

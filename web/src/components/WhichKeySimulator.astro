@@ -1,0 +1,435 @@
+---
+// Simulador interactivo which-key (EL EJEMPLO ANIDADO, fase 2.5, T3).
+// Permite pulsar teclas reales, navegar grupos anidados, retroceder con Esc y ver el comando/snippet real.
+import SectionHeading from "./ui/SectionHeading.astro";
+import { keymapTree } from "../data/keymaps";
+
+const serializedTree = JSON.stringify(keymapTree);
+---
+<section id="simulador" class="mx-auto max-w-6xl scroll-mt-24 px-4 py-16" aria-labelledby="simulador-title">
+  <SectionHeading
+    id="simulador-title"
+    number="01"
+    eyebrow="// ejemplo anidado"
+    title="Simulador Which-Key"
+    description="Presiona las teclas en tu teclado físico o haz clic en las opciones para explorar el árbol anidado de atajos tal como se siente dentro de Neovim."
+  />
+
+  <div
+    id="which-key-container"
+    tabindex="0"
+    class="relative mx-auto max-w-4xl rounded-xl border border-nord3/60 bg-nord1/90 p-6 shadow-2xl backdrop-blur outline-none transition-all focus:border-nord8 focus:ring-1 focus:ring-nord8"
+    aria-label="Simulador interactivo Which-Key. Haz clic para activar foco de teclado."
+  >
+    <!-- Barra superior: Breadcrumb + Estado de foco + Botón Reset -->
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-nord2 pb-4">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-xs text-nord4/60">Ruta:</span>
+        <div id="wk-breadcrumb" class="flex flex-wrap items-center gap-1.5 font-mono text-sm font-bold text-nord6">
+          <span class="rounded bg-nord0 px-2 py-0.5 text-nord8">Inicio</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span id="wk-focus-indicator" class="rounded border border-nord3 bg-nord0 px-2 py-0.5 font-mono text-xs text-nord4/60">
+          Haz clic aquí para enfocar teclado
+        </span>
+        <button
+          id="wk-btn-reset"
+          type="button"
+          class="rounded border border-nord3 bg-nord0 px-2.5 py-1 font-mono text-xs font-semibold text-nord4 hover:border-nord8 hover:text-nord8"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+
+      <!-- Área principal dinámica -->
+      <div id="wk-data-container" data-tree={serializedTree} class="hidden"></div>
+      <div class="min-h-[220px] py-6">
+      <!-- Mensaje Inicial: Presiona Space -->
+      <div id="wk-idle-view" class="flex flex-col items-center justify-center py-8 text-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-2xl border border-nord8/40 bg-nord0 shadow-inner">
+          <kbd class="font-mono text-lg font-bold text-nord8">Space</kbd>
+        </div>
+        <p class="mt-4 font-display text-lg font-bold text-nord6">Presiona la barra espaciadora para iniciar</p>
+        <p class="mt-1 font-mono text-xs text-nord4/70">O haz clic sobre el botón para abrir el menú líder</p>
+        <button
+          id="wk-btn-start"
+          type="button"
+          class="mt-4 rounded bg-nord8 px-4 py-2 font-mono text-xs font-bold text-nord0 hover:bg-nord8/90"
+        >
+          Pulsar Space
+        </button>
+      </div>
+
+      <!-- Menú de opciones / Hijos del árbol -->
+      <div id="wk-tree-view" class="hidden">
+        <div class="mb-3 flex items-center justify-between">
+          <p id="wk-group-label" class="font-mono text-xs uppercase tracking-wider text-nord8">Grupo</p>
+          <span class="font-mono text-xs text-nord4/60">Prensa <kbd class="rounded bg-nord0 px-1 border border-nord3">Esc</kbd> para volver</span>
+        </div>
+        <div id="wk-children-list" class="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+          <!-- Items generados dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Detalle de Acción Final (Nodo Hoja): info + preview 3D animado -->
+      <div id="wk-action-view" class="hidden">
+        <div class="grid gap-4 lg:grid-cols-2">
+          <!-- Izquierda: info del comando + botones -->
+          <div class="rounded-lg border border-nord8/40 bg-nord0/80 p-5">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <span class="rounded bg-nord8/20 px-2 py-0.5 font-mono text-xs font-bold text-nord8">Acción ejecutada</span>
+                <h3 id="wk-action-desc" class="mt-2 font-display text-xl font-bold text-nord6">Descripción</h3>
+                <p id="wk-action-desc-es" class="mt-1 text-sm text-nord4/80"></p>
+              </div>
+              <div class="flex shrink-0 flex-col gap-2">
+                <button
+                  id="wk-btn-replay"
+                  type="button"
+                  class="rounded border border-nord3 bg-nord1 px-2.5 py-1 font-mono text-xs text-nord4 hover:border-nord8 hover:text-nord8"
+                >
+                  Replay ↻
+                </button>
+                <button
+                  id="wk-btn-back"
+                  type="button"
+                  class="rounded border border-nord3 bg-nord1 px-2.5 py-1 font-mono text-xs text-nord4 hover:border-nord8"
+                >
+                  Volver (Esc)
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div>
+                <p class="font-mono text-xs text-nord4/60">Comando Neovim:</p>
+                <pre class="mt-1 overflow-x-auto rounded border border-nord3 bg-nord0 p-3 font-mono text-xs text-nord8"><code id="wk-action-cmd">cmd</code></pre>
+              </div>
+              <div class="flex items-center gap-2 pt-1 font-mono text-xs text-nord4/70">
+                <span>Definido en:</span>
+                <span id="wk-action-src" class="font-semibold text-nord4">source</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Derecha: viewport Neovim animado (Three.js) + fallback 2D -->
+          <div id="wk-nvim-wrap" class="hidden min-w-0">
+            <div
+              id="wk-nvim-stage"
+              class="relative aspect-video overflow-hidden rounded-lg border border-nord3/60 bg-nord0"
+              aria-hidden="true"
+            ></div>
+            <!-- Fallback DOM 2D: no-WebGL / prefers-reduced-motion -->
+            <div id="wk-nvim-fallback" class="hidden">
+              <div class="aspect-video overflow-hidden rounded-lg border border-nord3/60 bg-nord0 p-0">
+                <div class="flex items-center gap-1.5 border-b border-nord2 bg-nord1 px-3 py-1.5">
+                  <span class="h-2 w-2 rounded-full bg-nord11"></span>
+                  <span class="h-2 w-2 rounded-full bg-nord13"></span>
+                  <span class="h-2 w-2 rounded-full bg-nord14"></span>
+                  <span class="ml-2 font-mono text-[10px] text-nord4/60">nvim — vista previa</span>
+                </div>
+                <div class="flex h-[calc(100%-42px)] flex-col p-3 font-mono text-[11px] leading-5 text-nord4/80">
+                  <p>1 <span class="text-nord8">fn</span> main() {</p>
+                  <p>2   <span class="text-nord4/60">...</span></p>
+                  <p class="mt-auto">
+                    <span id="wk-fallback-anim" class="rounded bg-nord2 px-2 py-1 text-nord8"></span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p id="wk-stage-status" class="sr-only" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra inferior: Mini visor de tecla presionada -->
+    <div class="flex items-center justify-between border-t border-nord2 pt-4 font-mono text-xs text-nord4/60">
+      <div class="flex items-center gap-2">
+        <span>Última tecla:</span>
+        <kbd id="wk-key-echo" class="rounded border border-nord3 bg-nord0 px-1.5 py-0.5 text-nord8 min-w-[20px] text-center">-</kbd>
+      </div>
+      <div>
+        <span>Navega con teclado o toques</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { createSimulator } from "./which-key";
+  import { esForEntry, type KeymapNode, type Mode } from "../data/keymaps";
+  import { resolvePreview, type PreviewSpec } from "./nvim-preview/resolvePreview";
+  import type { NvimStageHandle } from "./nvim-preview/NvimStage";
+
+  // Inicialización de la máquina de estados y UI del simulador
+  const initSimulatorUI = () => {
+    const dataContainer = document.getElementById("wk-data-container");
+    const rawTree = dataContainer?.dataset.tree;
+    if (!rawTree) return;
+
+    const rootNode = JSON.parse(rawTree) as KeymapNode;
+    const sim = createSimulator(rootNode);
+
+    const container = document.getElementById("which-key-container");
+    const breadcrumbEl = document.getElementById("wk-breadcrumb");
+    const focusIndEl = document.getElementById("wk-focus-indicator");
+    const idleView = document.getElementById("wk-idle-view");
+    const treeView = document.getElementById("wk-tree-view");
+    const actionView = document.getElementById("wk-action-view");
+    const childrenList = document.getElementById("wk-children-list");
+    const groupLabelEl = document.getElementById("wk-group-label");
+    const keyEchoEl = document.getElementById("wk-key-echo");
+
+    const actionDesc = document.getElementById("wk-action-desc");
+    const actionDescEs = document.getElementById("wk-action-desc-es");
+    const actionCmd = document.getElementById("wk-action-cmd");
+    const actionSrc = document.getElementById("wk-action-src");
+
+    const btnReset = document.getElementById("wk-btn-reset");
+    const btnStart = document.getElementById("wk-btn-start");
+    const btnBack = document.getElementById("wk-btn-back");
+    const btnReplay = document.getElementById("wk-btn-replay");
+
+    // Preview 3D (PLAN-SIMULADOR-3D.md §3.3)
+    const stageEl = document.getElementById("wk-nvim-stage");
+    const stageWrap = document.getElementById("wk-nvim-wrap");
+    const fallbackEl = document.getElementById("wk-nvim-fallback");
+    const fallbackAnim = document.getElementById("wk-fallback-anim");
+    const stageStatus = document.getElementById("wk-stage-status");
+
+    if (!container) return;
+
+    // ── Stage Three.js: lazy-load bajo demanda (patrón de Hero.astro) ──────
+    let stage: NvimStageHandle | null = null;
+    let stagePromise: Promise<boolean> | null = null;
+    let lastPlayedPath: string | null = null;
+    let lastSpec: PreviewSpec | null = null;
+
+    const showFallback = () => {
+      fallbackEl?.classList.remove("hidden");
+      stageEl?.classList.add("hidden");
+    };
+
+    const useFallback = (spec: PreviewSpec | null) => {
+      showFallback();
+      if (spec && fallbackAnim) {
+        fallbackAnim.textContent = `▶ ${spec.kind}: ${spec.command}`;
+      }
+    };
+
+    const ensureStage = (): Promise<boolean> => {
+      if (stage) return Promise.resolve(true);
+      if (stagePromise) return stagePromise;
+      stagePromise = (async () => {
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const hasWebGL = (() => {
+          try {
+            return !!document.createElement("canvas").getContext("webgl");
+          } catch {
+            return false;
+          }
+        })();
+        if (reduced || !hasWebGL || !stageEl) {
+          useFallback(lastSpec);
+          return false;
+        }
+
+        try {
+          const { initNvimStage } = await import("./nvim-preview/NvimStage");
+          stage = initNvimStage(stageEl);
+          if (!stageEl.querySelector("canvas")) {
+            stage = null;
+            useFallback(lastSpec);
+            return false;
+          }
+          return true;
+        } catch (err) {
+          console.warn("Preview 3D fallback activo:", err);
+          useFallback(lastSpec);
+          return false;
+        }
+      })();
+      return stagePromise;
+    };
+
+    const playLeaf = async (spec: PreviewSpec) => {
+      if (stageWrap) stageWrap.classList.remove("hidden");
+      stageStatus?.replaceChildren(
+        document.createTextNode(`Simulación: ${spec.kind}. ${spec.command}`),
+      );
+      const ok = await ensureStage();
+      if (ok && stage) {
+        await stage.play(spec);
+      } else {
+        useFallback(spec);
+      }
+    };
+
+    const stopStage = () => {
+      lastPlayedPath = null;
+      lastSpec = null;
+      stage?.stop();
+      stageWrap?.classList.add("hidden");
+    };
+
+    // Prefetch opcional al abrir el menú líder (requestIdleCallback, patrón Hero)
+    const prefetchStage = () => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(() => void ensureStage(), { timeout: 2000 });
+      }
+    };
+
+    btnReplay?.addEventListener("click", () => {
+      if (lastSpec) void playLeaf(lastSpec);
+      container.focus();
+    });
+
+    // Foco de teclado
+    container.addEventListener("focus", () => {
+      if (focusIndEl) {
+        focusIndEl.textContent = "Teclado activo ●";
+        focusIndEl.className = "rounded border border-nord8/40 bg-nord8/10 px-2 py-0.5 font-mono text-xs font-bold text-nord8";
+      }
+    });
+
+    container.addEventListener("blur", () => {
+      if (focusIndEl) {
+        focusIndEl.textContent = "Haz clic aquí para enfocar teclado";
+        focusIndEl.className = "rounded border border-nord3 bg-nord0 px-2 py-0.5 font-mono text-xs text-nord4/60";
+      }
+    });
+
+    // Escucha eventos keydown controlados dentro del contenedor
+    container.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        sim.stepBack();
+        return;
+      }
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        sim.stepBack();
+        return;
+      }
+      if (e.key === " " || e.key.length === 1) {
+        e.preventDefault();
+        sim.sendKey(e.key);
+      }
+    });
+
+    btnReset?.addEventListener("click", () => sim.reset());
+    btnStart?.addEventListener("click", () => {
+      sim.sendKey("Space");
+      container.focus();
+      prefetchStage();
+    });
+    btnBack?.addEventListener("click", () => sim.stepBack());
+
+    // Renderizador reactivo
+    sim.subscribe((state) => {
+      // 1. Tecla eco
+      if (keyEchoEl) {
+        keyEchoEl.textContent = state.activeKey || "-";
+      }
+
+      // 2. Breadcrumb
+      if (breadcrumbEl) {
+        if (state.pressedKeys.length === 0) {
+          breadcrumbEl.innerHTML = `<span class="rounded bg-nord0 px-2 py-0.5 text-nord8">Inicio</span>`;
+        } else {
+          breadcrumbEl.innerHTML = state.pressedKeys
+            .map((k) => `<kbd class="rounded border border-nord3 bg-nord0 px-2 py-0.5 text-nord8">${k}</kbd>`)
+            .join(`<span class="text-nord3">→</span>`);
+        }
+      }
+
+      // 3. Selección de vista
+      if (state.pressedKeys.length === 0) {
+        idleView?.classList.remove("hidden");
+        treeView?.classList.add("hidden");
+        actionView?.classList.add("hidden");
+        stopStage();
+        return;
+      }
+
+      idleView?.classList.add("hidden");
+
+      // Si el nodo actual tiene comando y no tiene hijos (o es hoja ejecutable)
+      const hasChildren = (state.currentNode.children?.length ?? 0) > 0;
+      if (state.currentNode.command && !hasChildren) {
+        treeView?.classList.add("hidden");
+        actionView?.classList.remove("hidden");
+        if (actionDesc) actionDesc.textContent = state.currentNode.description || state.currentNode.label || "Sin descripción";
+        if (actionDescEs) {
+          const leafPath = "<Space>" + state.pressedKeys.slice(1).join("");
+          const modes = (state.currentNode.modes ?? ["n"]) as Mode[];
+          actionDescEs.textContent = esForEntry(leafPath, modes) ?? "";
+        }
+        if (actionCmd) actionCmd.textContent = state.currentNode.command;
+        if (actionSrc) actionSrc.textContent = state.currentNode.source || "Configuración general";
+
+        // Preview 3D: solo si se entra en una hoja DISTINTA (subscribe se
+        // dispara en cada tecla; §3.3 guarda lastPlayedPath contra doble disparo)
+        const spec = resolvePreview(state.currentNode);
+        const leafPath = "<Space>" + state.pressedKeys.slice(1).join("");
+        if (spec) {
+          if (leafPath !== lastPlayedPath) {
+            lastPlayedPath = leafPath;
+            lastSpec = spec;
+            void playLeaf(spec);
+          }
+        } else {
+          lastSpec = null;
+          stageWrap?.classList.add("hidden");
+        }
+      } else {
+        actionView?.classList.add("hidden");
+        treeView?.classList.remove("hidden");
+        stopStage();
+
+        if (groupLabelEl) {
+          groupLabelEl.textContent = state.currentNode.label
+            ? `Grupo: ${state.currentNode.label}`
+            : `Menú <${state.currentNode.key}>`;
+        }
+
+        if (childrenList) {
+          childrenList.innerHTML = "";
+          const children = state.currentNode.children || [];
+          children.forEach((child) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "flex items-center justify-between rounded border border-nord2 bg-nord0/80 px-3 py-2 text-left transition-colors hover:border-nord8 hover:bg-nord2/60";
+
+            const isGroup = (child.children?.length ?? 0) > 0;
+            const labelText = child.label ? `+${child.label}` : child.description || "";
+
+            btn.innerHTML = `
+              <div class="flex items-center gap-2">
+                <kbd class="rounded border border-nord3 bg-nord1 px-1.5 py-0.5 font-mono text-xs font-bold text-nord8">${child.key}</kbd>
+                <span class="font-mono text-xs text-nord4 truncate max-w-[160px]">${labelText}</span>
+              </div>
+              <span class="font-mono text-[10px] text-nord3">${isGroup ? "grupo ›" : "acción"}</span>
+            `;
+
+            btn.addEventListener("click", () => {
+              sim.sendKey(child.key);
+              container.focus();
+            });
+
+            childrenList.appendChild(btn);
+          });
+        }
+      }
+    });
+
+    // Dispose del stage al abandonar la página (patrón de Hero.astro)
+    window.addEventListener("beforeunload", () => stage?.dispose(), { once: true });
+  };
+
+  initSimulatorUI();
+</script>

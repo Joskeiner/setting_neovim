@@ -1,0 +1,78 @@
+---
+import SectionHeading from "./ui/SectionHeading.astro";
+import { installPaths, requirements } from "../data/editor";
+---
+<section id="instalacion" class="mx-auto max-w-6xl scroll-mt-24 px-4 py-16" aria-labelledby="instalacion-title">
+  <SectionHeading
+    id="instalacion-title"
+    number="05"
+    eyebrow="// instalacion"
+    title="Instalación"
+    description="Los 3 caminos del README. Renderizado desde src/data/editor.ts, con botón de copiar por bloque."
+  />
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    {
+      installPaths.map((path) => (
+        <div class="flex flex-col rounded-lg border border-nord2 bg-nord1 p-4">
+          <h3 class="font-display text-base font-bold text-nord6">{path.title}</h3>
+          {path.note && <p class="mt-1 text-sm text-nord4">{path.note}</p>}
+          <div class="mt-3 flex flex-1 flex-col" data-code-block>
+            <div class="mb-2 flex justify-end">
+              <button
+                type="button"
+                data-copy
+                class="rounded border border-nord3 bg-nord1 px-2 py-1 font-mono text-xs text-nord8 hover:bg-nord2"
+                aria-label={`Copiar comandos de ${path.title}`}
+              >
+                copiar
+              </button>
+            </div>
+            <pre class="flex-1 overflow-x-auto rounded border border-nord3 bg-nord0 p-3 font-mono text-xs leading-relaxed text-nord4"><code>{path.commands.join("\n")}</code></pre>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <h3 class="mb-3 mt-10 font-display text-xl font-bold text-nord6">Requisitos</h3>
+  <div class="overflow-x-auto rounded-lg border border-nord2">
+    <table class="w-full min-w-[560px] border-collapse bg-nord1 text-left text-sm">
+      <thead>
+        <tr class="border-b border-nord2 font-mono text-xs text-nord8">
+          <th scope="col" class="px-4 py-2">Dependencia</th>
+          <th scope="col" class="px-4 py-2">Version minima</th>
+          <th scope="col" class="px-4 py-2">Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          requirements.map((req) => (
+            <tr class="border-b border-nord2 last:border-0">
+              <td class="px-4 py-2 font-semibold text-nord6">{req.dependency}</td>
+              <td class="px-4 py-2 font-mono text-xs text-nord8">{req.version}</td>
+              <td class="px-4 py-2">{req.notes}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  // Copiado local del bloque, sin framework (convencion del plan: Vanilla TS).
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const code = btn.closest("[data-code-block]")?.querySelector("code")?.innerText ?? "";
+      try {
+        await navigator.clipboard.writeText(code + "\n");
+        const original = btn.innerText;
+        btn.innerText = "copiado ✓";
+        setTimeout(() => (btn.innerText = original), 1500);
+      } catch {
+        btn.innerText = "error";
+      }
+    });
+  });
+</script>

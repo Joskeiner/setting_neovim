@@ -1,0 +1,116 @@
+---
+// Componente Hero con escena Three.js integrada (fase 2.4, T3).
+// Incluye degradado de fallback si no hay WebGL o con prefers-reduced-motion.
+---
+<section id="inicio" class="relative mx-auto max-w-6xl scroll-mt-24 px-4 pb-12 pt-16 lg:pt-24">
+  <div class="grid items-center gap-12 lg:grid-cols-12">
+    <!-- Columna de texto -->
+    <div class="lg:col-span-7">
+      <div class="inline-flex items-center gap-2 rounded border border-nord3/60 bg-nord1/60 px-2.5 py-1 font-mono text-xs text-nord8 backdrop-blur" data-pixel>
+        <span class="inline-block h-2 w-2 rounded-full bg-nord8 animate-pulse"></span>
+        <span>~/setting_neovim • v0.1.0</span>
+      </div>
+
+      <h1 class="mt-4 font-display text-4xl font-bold leading-[1.1] tracking-tight text-nord6 sm:text-5xl lg:text-6xl">
+        Tu configuración de Neovim, <span class="bg-gradient-to-r from-nord8 via-nord6 to-nord4 bg-clip-text text-transparent">viva y navegable</span>.
+      </h1>
+
+      <p class="mt-6 max-w-xl text-base leading-relaxed text-nord4/90 sm:text-lg">
+        Una base Nord ultra-rápida construida sobre <code class="font-mono text-xs text-nord8">lazy.nvim</code> con 102 keymaps,
+        LSPs para Go/Rust/C++/TS y soporte nativo para agentes de IA vía <code class="font-mono text-xs text-nord8">opencode.nvim</code>.
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-4">
+        <a
+          href="#simulador"
+          class="inline-flex items-center gap-2 rounded bg-nord8 px-5 py-2.5 font-mono text-sm font-semibold text-nord0 shadow-lg shadow-nord8/10 transition-all hover:bg-nord8/90 hover:shadow-nord8/20 hover:-translate-y-0.5"
+          data-pixel
+        >
+          <span>Probar simulador</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="#keymaps"
+          class="inline-flex items-center gap-2 rounded border border-nord3 bg-nord1/50 px-5 py-2.5 font-mono text-sm text-nord6 backdrop-blur transition-all hover:border-nord8 hover:text-nord8 hover:-translate-y-0.5"
+        >
+          <span>102 Keymaps</span>
+        </a>
+        <a
+          href="#instalacion"
+          class="inline-flex items-center gap-1 font-mono text-sm text-nord4/80 hover:text-nord8 hover:underline px-2"
+        >
+          <span>Instalar (script)</span>
+        </a>
+      </div>
+
+      <!-- Métricas rápidas de la config -->
+      <div class="mt-12 grid grid-cols-3 gap-4 border-t border-nord2/80 pt-6 font-mono text-xs text-nord4/70 sm:gap-6">
+        <div>
+          <p class="font-display text-xl font-bold text-nord6 sm:text-2xl">102</p>
+          <p class="mt-0.5 text-nord4/70">keymaps mapeados</p>
+        </div>
+        <div>
+          <p class="font-display text-xl font-bold text-nord6 sm:text-2xl">22</p>
+          <p class="mt-0.5 text-nord4/70">plugins activos</p>
+        </div>
+        <div>
+          <p class="font-display text-xl font-bold text-nord6 sm:text-2xl">Nord</p>
+          <p class="mt-0.5 text-nord4/70">paleta oficial</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna 3D / Keycaps interactivos -->
+    <div class="relative lg:col-span-5 flex justify-center items-center">
+      <!-- Fondo decorativo con gradiente Nord -->
+      <div class="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-nord8/10 via-nord1/30 to-nord3/10 blur-2xl -z-10" />
+
+      <div
+        id="hero-3d-container"
+        class="relative h-[380px] w-full max-w-[440px] cursor-grab active:cursor-grabbing rounded-2xl border border-nord3/40 bg-nord1/20 backdrop-blur-sm sm:h-[440px]"
+      >
+        <!-- Fallback estático cuando no carga Three.js o prefers-reduced-motion -->
+        <div id="hero-fallback" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+          <div class="flex flex-wrap justify-center gap-2 max-w-[260px]">
+            <span class="rounded border border-nord8 bg-nord1 px-4 py-2 font-mono text-sm font-bold text-nord8 shadow">Space</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">f</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">o</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">d</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">g</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">r</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">t</span>
+            <span class="rounded border border-nord3 bg-nord0 px-3 py-2 font-mono text-xs text-nord4">c</span>
+          </div>
+          <p class="mt-4 font-mono text-xs text-nord4/60">Leader + grupos interactivos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Carga perezosa de la escena Three.js (módulo aislado con import dinámico)
+  const init3D = async () => {
+    const container = document.getElementById("hero-3d-container");
+    const fallback = document.getElementById("hero-fallback");
+    if (!container) return;
+
+    try {
+      const { initHeroScene } = await import("./HeroScene");
+      const cleanup = initHeroScene(container);
+      // Si se cargó con éxito el canvas WebGL, ocultamos el fallback
+      if (container.querySelector("canvas")) {
+        fallback?.classList.add("hidden");
+      }
+      window.addEventListener("beforeunload", cleanup, { once: true });
+    } catch (err) {
+      console.warn("Hero 3D fallback activo:", err);
+    }
+  };
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(() => init3D(), { timeout: 2000 });
+  } else {
+    setTimeout(init3D, 200);
+  }
+</script>

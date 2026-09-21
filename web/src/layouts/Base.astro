@@ -1,0 +1,55 @@
+---
+// HTML shell base: SEO/OG minimo, fuentes y tokens Nord.
+// La direccion visual completa (ritmo, kbd, pixel accents) llega en la fase 2.3 (T3).
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "setting_neovim — Configuracion de Neovim",
+  description = "Landing page de la configuracion personal de Neovim de este repo: opciones, plugins, LSPs y 102 keymaps navegables.",
+} = Astro.props;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#2e3440" />
+    <!-- TODO (dominio/deploy): canonical + og:image. Fuera de alcance v1 segun PLAN-LANDING.md sec.8. -->
+    <!-- Fuentes self-hosted: @font-face en global.css (subsets woff2 en /fonts) -->
+    <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/space-grotesk-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/jetbrains-mono-400.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="bg-nord0 text-nord4 font-sans">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-nord8 focus:px-3 focus:py-2 focus:text-nord0"
+    >
+      Saltar al contenido
+    </a>
+    <header class="sticky top-0 z-40 border-b border-nord2 bg-nord0/90 backdrop-blur">
+      <nav class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 font-mono text-sm" aria-label="Navegacion principal">
+        <a href="#inicio" class="font-bold text-nord6">~/setting_neovim</a>
+        <a href="#simulador" class="text-nord4 hover:text-nord8">simulador</a>
+        <a href="#keymaps" class="text-nord4 hover:text-nord8">keymaps</a>
+        <a href="#plugins" class="text-nord4 hover:text-nord8">plugins</a>
+        <a href="#lsp" class="text-nord4 hover:text-nord8">lsp</a>
+        <a href="#instalacion" class="text-nord4 hover:text-nord8">instalacion</a>
+      </nav>
+    </header>
+    <main id="contenido">
+      <slot />
+    </main>
+  </body>
+</html>

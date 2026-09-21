@@ -1,0 +1,26 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  id?: string;
+  number?: string;
+}
+
+const { eyebrow, title, description, id, number } = Astro.props;
+---
+<div class="mb-8">
+  <div class="flex items-center gap-2">
+    {number && (
+      <span class="rounded bg-nord3/40 px-1.5 py-0.5 font-mono text-[11px] font-bold text-nord8" data-pixel>
+        {number}
+      </span>
+    )}
+    <p class="font-mono text-sm text-nord8" aria-hidden="true">{eyebrow}</p>
+  </div>
+  <h2 id={id} class="mt-2 font-display text-3xl font-bold tracking-tight text-nord6 scroll-mt-24 sm:text-4xl">
+    {title}
+  </h2>
+  {description && <p class="mt-3 max-w-3xl text-sm leading-relaxed text-nord4/90 sm:text-base">{description}</p>}
+  <div class="mt-5 h-[1px] w-full bg-gradient-to-r from-nord8/40 via-nord2 to-transparent" />
+</div>

@@ -1,0 +1,73 @@
+---
+import SectionHeading from "./ui/SectionHeading.astro";
+import { editorOptions, lsps, yankAutocmd } from "../data/editor";
+---
+<section id="lsp" class="mx-auto max-w-6xl scroll-mt-24 px-4 py-16" aria-labelledby="lsp-title">
+  <SectionHeading
+    id="lsp-title"
+    number="04"
+    eyebrow="// lsp + opciones"
+    title="LSPs y opciones del editor"
+    description="Transcrito de lua/config/lsp.lua e init.lua. Renderizado desde src/data/editor.ts."
+  />
+
+  <h3 class="mb-3 font-display text-xl font-bold text-nord6">LSPs configurados</h3>
+  <div class="overflow-x-auto rounded-lg border border-nord2">
+    <table class="w-full min-w-[640px] border-collapse bg-nord1 text-left text-sm">
+      <thead>
+        <tr class="border-b border-nord2 font-mono text-xs text-nord8">
+          <th scope="col" class="px-4 py-2">LSP</th>
+          <th scope="col" class="px-4 py-2">Lenguajes</th>
+          <th scope="col" class="px-4 py-2">Flags / filetypes / root markers</th>
+          <th scope="col" class="px-4 py-2">Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          lsps.map((lsp) => (
+            <tr class="border-b border-nord2 align-top last:border-0">
+              <td class="px-4 py-2 font-mono font-semibold text-nord6">{lsp.name}</td>
+              <td class="px-4 py-2">{lsp.languages}</td>
+              <td class="px-4 py-2 font-mono text-xs">
+                {lsp.cmd.length > 0 && <div class="text-nord4">{lsp.cmd.join(" ")}</div>}
+                <div class="mt-1 text-nord4">ft: {lsp.filetypes.join(", ")}</div>
+                <div class="mt-1 text-nord4">root: {lsp.rootMarkers.join(", ")}</div>
+              </td>
+              <td class="px-4 py-2">{lsp.extra}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-2 text-sm text-nord4">
+    Ambos LSPs se instalan automáticamente con Mason al abrir un archivo del lenguaje (<code class="font-mono text-xs text-nord8">mason-lspconfig.nvim</code>).
+  </p>
+
+  <h3 class="mb-3 mt-10 font-display text-xl font-bold text-nord6">Opciones del editor</h3>
+  <div class="overflow-x-auto rounded-lg border border-nord2">
+    <table class="w-full min-w-[560px] border-collapse bg-nord1 text-left text-sm">
+      <thead>
+        <tr class="border-b border-nord2 font-mono text-xs text-nord8">
+          <th scope="col" class="px-4 py-2">Opcion</th>
+          <th scope="col" class="px-4 py-2">Valor</th>
+          <th scope="col" class="px-4 py-2">Efecto</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          editorOptions.map((opt) => (
+            <tr class="border-b border-nord2 last:border-0">
+              <td class="px-4 py-2 font-mono text-xs text-nord6">{opt.option}</td>
+              <td class="px-4 py-2 font-mono text-xs text-nord8">{opt.value}</td>
+              <td class="px-4 py-2">{opt.effect}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="mb-3 mt-10 font-display text-xl font-bold text-nord6">Highlight on yank</h3>
+  <pre class="overflow-x-auto rounded-lg border border-nord2 bg-nord1 p-4 font-mono text-xs leading-relaxed text-nord4"><code>{yankAutocmd}</code></pre>
+</section>
